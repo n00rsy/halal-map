@@ -44,7 +44,7 @@ result_dict = data
 places_list = []
 
 # Google Maps API Key
-API_KEY = 'AIzaSyBeQvkyGVlDbl91fEjxMBfgSwK7hIP4Slk'
+API_KEY = ''
 
 gmaps = googlemaps.Client(key=API_KEY)
 
