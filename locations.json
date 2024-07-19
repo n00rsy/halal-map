@@ -1,0 +1,224 @@
+[
+    {
+        "Name": "The Port of Peri Peri",
+        "Address": "975 Old Post Rd. Walpole, MA 02081",
+        "Phone": "(781) 499-5919",
+        "Website": "http://myperiperi.com/"
+    },
+    {
+        "Name": "Guac Time",
+        "Address": "500 Connecticut Ave. Norwalk, CT 06854",
+        "Phone": "(203) 286-6452",
+        "Website": "https://guactimenyc.com/"
+    },
+    {
+        "Name": "Al Sultan",
+        "Address": "6050 Meadowridge Center Dr, Elkridge, MD 21075",
+        "Phone": "(410) 799-7700",
+        "Website": "https://alsultanrestaurantus.com/"
+    },
+    {
+        "Name": "Addy\u2019s Barbeque Baltimore",
+        "Address": "5860 Baltimore National Pike E. Catonsville, MD 21228",
+        "Phone": "(410) 747-7570",
+        "Website": "https://www.addysbarbeque.com/"
+    },
+    {
+        "Name": "Biryani & Bakers",
+        "Address": "6600 Baltimore National Pike, Catonsville, MD 21228",
+        "Phone": "(443) 300-7866",
+        "Website": "N/A"
+    },
+    {
+        "Name": "Bismillah Kabob House",
+        "Address": "7530 Ritchie Hwy, Glen Burnie, MD 21061",
+        "Phone": "(410) 590-9549",
+        "Website": "N/A"
+    },
+    {
+        "Name": "Danish Foods",
+        "Address": "1722 N. Rolling Rd. Windsormill, MD 21244",
+        "Phone": "(410) 298-0960",
+        "Website": "http://www.danishhalalfoods.com/"
+    },
+    {
+        "Name": "Hunan Village Tysons",
+        "Address": "8607 Westwood Center Dr, Vienna, VA 22182",
+        "Phone": "(703) 448-0900",
+        "Website": "https://www.hunanvillagetysons.com/"
+    },
+    {
+        "Name": "Meet & Feast Restaurant and Banquet Hall",
+        "Address": "1724 Woodlawn Dr. #30 Baltimore, MD 21207",
+        "Phone": "(443) 348-7376",
+        "Website": "N/A"
+    },
+    {
+        "Name": "Nash & Smash",
+        "Address": "8450 Baltimore National Pike, Suite 140, Ellicott City, MD 21043",
+        "Phone": "(410) 988-5572",
+        "Website": "https://www.nashandsmash.com/"
+    },
+    {
+        "Name": "Peri Peri Original",
+        "Address": "8450 Baltimore National Pike, Suite 140 Ellicott City, MD 21043",
+        "Phone": "(410) 988-5572",
+        "Website": "https://periperioriginaldmv.com/"
+    },
+    {
+        "Name": "All Halal Meat and Groceries",
+        "Address": "3551 Washington Blvd #100, Lansdowne, MD 21227",
+        "Phone": "(843) 814-4892",
+        "Website": "N/A"
+    },
+    {
+        "Name": "Al Wahid Foods",
+        "Address": "1724 Woodlawn Dr. #36 Woodlawn, MD 21207",
+        "Phone": "(410) 265-6622",
+        "Website": "N/A"
+    },
+    {
+        "Name": "Bamyan Halal Meat",
+        "Address": "5134 Thunder Hill Road, Suite A, Columbia, MD 21045",
+        "Phone": "(410) 801-5664",
+        "Website": "N/A"
+    },
+    {
+        "Name": "Bismillah Halal Meat & Grocery",
+        "Address": "7530 Ritchie Hwy, Glen Burnie, MD 21061",
+        "Phone": "(410) 590-9549",
+        "Website": "N/A"
+    },
+    {
+        "Name": "Danish Foods",
+        "Address": "1722 N. Rolling Rd. Windsormill, MD 21244",
+        "Phone": "(410) 298-0960",
+        "Website": "N/A"
+    },
+    {
+        "Name": "Paaq Halal Meat & Grocery",
+        "Address": "6400 Baltimore National Pike Catonsville, MD 21228",
+        "Phone": "(410) 970-2790",
+        "Website": "N/A"
+    },
+    {
+        "Name": "The Port of Peri Peri",
+        "Address": "51 NJ-17 East Rutherford, NJ 07073",
+        "Phone": "(201) 414-5505",
+        "Website": "http://myperiperi.com/"
+    },
+    {
+        "Name": "Chicken Shack",
+        "Address": "4011 E. Tremont Avenue Bronx, NY 10465 (929) 777-9190",
+        "Phone": "N/A",
+        "Website": "https://chickenshackny.com/"
+    },
+    {
+        "Name": "Guac Time",
+        "Address": "599 6th Ave. New York, NY 10011",
+        "Phone": "(646) 678-4053",
+        "Website": "https://guactimenyc.com/"
+    },
+    {
+        "Name": "Guac Time",
+        "Address": "412 S Broadway, Hicksville, NY 11801",
+        "Phone": "(516) 465-2042",
+        "Website": "https://guactimenyc.com/"
+    },
+    {
+        "Name": "Halal Bros Kabab Grill",
+        "Address": "667 Elmont Rd, Elmont, NY 11003",
+        "Phone": "(516) 612-7272",
+        "Website": "https://www.halalbroskababgrillmenu.com/"
+    },
+    {
+        "Name": "Hot Peppers",
+        "Address": "78-33 Springfield Blvd. Queens, NY 11364",
+        "Phone": "(347) 676-7566",
+        "Website": "http://hotpeppersinc.com/"
+    },
+    {
+        "Name": "Hot Peppers",
+        "Address": "28-21 Steinway St. Queens, NY 11103",
+        "Phone": "(347) 676-7566",
+        "Website": "http://hotpeppersinc.com/"
+    },
+    {
+        "Name": "Just Halal",
+        "Address": "205-02 Hillside Avenue, Queens, NY 11423",
+        "Phone": "(718) 464-0517",
+        "Website": "https://justhalalny.com/"
+    },
+    {
+        "Name": "Kandahar Grill",
+        "Address": "459A S Broadway Hicksville, NY 11801",
+        "Phone": "(516) 595-7886",
+        "Website": "https://www.nykandahargrill.com/"
+    },
+    {
+        "Name": "Sunshine Hicksville",
+        "Address": "275 W Old Country Rd, Hicksville, NY 11801",
+        "Phone": "(516) 622-0002",
+        "Website": "https://www.sunshinerestaurantny.com/"
+    },
+    {
+        "Name": "Uncle\u2019s Fried Chicken",
+        "Address": "16304 Hillside Ave. Queens, NY 11432",
+        "Phone": "(718) 374-3466",
+        "Website": "N/A"
+    },
+    {
+        "Name": "Zabiha Burgers & Fries",
+        "Address": "44-03 Kissena Blvd. Queens, NY 11355",
+        "Phone": "(201) 503-3719",
+        "Website": "N/A"
+    },
+    {
+        "Name": "Akma Halal Meat",
+        "Address": "876-21 Connetquot Ave, Islip Terrace, NY 11752",
+        "Phone": "(631) 228-0000",
+        "Website": "N/A"
+    },
+    {
+        "Name": "Barakat Halal Meat Grocery",
+        "Address": "73-09 Main St. Queens, NY 11367",
+        "Phone": "(718) 793-6991",
+        "Website": "N/A"
+    },
+    {
+        "Name": "Farmingdale Grocery & Halal Meat",
+        "Address": "974 Fulton St. Farmingdale, NY 11735",
+        "Phone": "(516) 927-8099",
+        "Website": "N/A"
+    },
+    {
+        "Name": "Kawran Bazar Supermarket",
+        "Address": "8754 168th Pl, Queens, NY 11432",
+        "Phone": "(718) 206-3913",
+        "Website": "N/A"
+    },
+    {
+        "Name": "Mach Bazar",
+        "Address": "71-08 35th Ave. Queens, NY 11372",
+        "Phone": "(718) 205-6550",
+        "Website": "N/A"
+    },
+    {
+        "Name": "Lipton Hall",
+        "Address": "33 Washington Square West New York, NY 10011",
+        "Phone": "(212) 995-3074",
+        "Website": "https://www.nyu.edu/students/student-information-and-resources/housing-and-dining/dining/dietary-options/HalalDiningOptions.html"
+    },
+    {
+        "Name": "Kimmel Marketplace",
+        "Address": "60 Washington Square South New York, NY 10011",
+        "Phone": "(212) 998-4573",
+        "Website": "https://www.nyu.edu/students/student-information-and-resources/housing-and-dining/dining/dietary-options/HalalDiningOptions.html"
+    },
+    {
+        "Name": "Jasper Kane Caf\u00e9",
+        "Address": "6 MetroTech Center Brooklyn, NY 11201",
+        "Phone": "(718) 260-3786",
+        "Website": "https://www.nyu.edu/students/student-information-and-resources/housing-and-dining/dining/dietary-options/HalalDiningOptions.html"
+    }
+]
