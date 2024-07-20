@@ -34,6 +34,7 @@ def generate_html(resturaunts):
     <head>
         <title>Halal Map</title>
         <script src="https://maps.googleapis.com/maps/api/js?key={GOOGLE_MAPS_API_KEY}"></script>
+        <meta name="viewport" content="width=device-width">
         <script>
             function initMap() {{
                 var map = new google.maps.Map(document.getElementById('map'), {{
