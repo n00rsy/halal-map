@@ -1,87 +1,101 @@
-places = ['boston', 'connecticut', 'dmv', 'newjersey', 'newyork', 'pennsylvania']
-
 import time
-import json
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.common.by import By
 from bs4 import BeautifulSoup
 
+class Hfsaa:
+    def __init__(self, driver):
+        self.driver = driver
 
-def get_details(place):
-    # Set up Selenium WebDriver
-    options = webdriver.ChromeOptions()
-    options.headless = True  # Run Chrome in headless mode
-    driver = webdriver.Chrome(options=options)
 
-    # URL of the website to scrape
-    url = "https://www.hfsaa.org/" + place + "/"
+    def get_zone_urls(self):
+        # URL of the website to scrape
+        url = 'https://www.hfsaa.org/restaurants/'
 
-    # Fetch the website
-    driver.get(url)
+        # Fetch the website
+        self.driver.get(url)
 
-    # Wait for the page to fully load
-    time.sleep(5)
+        # Wait for the page to fully load
+        time.sleep(5)
 
-    # Get page source
-    page_source = driver.page_source
+        # Get page source
+        page_source = self.driver.page_source
 
-    # Close the WebDriver
-    driver.quit()
-    # Parse the HTML content
-    soup = BeautifulSoup(page_source, "html.parser")
+        # Parse the HTML content
+        soup = BeautifulSoup(page_source, "html.parser")
 
-    # Find the container with locations (based on the website's structure)
-    locations_container = soup.find_all("div", class_="fusion-column-wrapper fusion-column-has-shadow fusion-flex-justify-content-flex-start fusion-content-layout-column")
+        zone_urls = []
 
-    # List to store location details
-    locations = []
+        # Find the container with locations (based on the website's structure)
+        zone_containers = soup.find_all("a", class_="fusion-column-anchor")
+        for zone_container in zone_containers:
+            url = zone_container['href']
+            zone_urls.append(url)
+        return zone_urls
 
-        # Iterate through each location and extract details
-    for location in locations_container:
-        name_tag = location.find("h4", class_="fusion-title-heading")
 
-        if not name_tag:
-            continue
+    def get_zone_resturaunts(self, zone_url):
+        print(f"Getting resturaunts from zone: {zone_url}")
+        # Fetch the website
+        self.driver.get(zone_url)
 
-        name = name_tag.text.strip()
+        # Wait for the page to fully load
+        time.sleep(5)
 
-        print(name)
+        # Get page source
+        page_source = self.driver.page_source
 
-        link_tag = name_tag.find("a") if name_tag else None
-        link = link_tag['href'] if link_tag else "N/A"
+        # Parse the HTML content
+        soup = BeautifulSoup(page_source, "html.parser")
 
-        address_tag = location.find("div", class_="fusion-text")
+        # Find the container with locations (based on the website's structure)
+        location_containers = soup.find_all("div", class_="fusion-column-wrapper fusion-column-has-shadow fusion-flex-justify-content-flex-start fusion-content-layout-column")
 
-        address = address_tag.find("p").text.strip().replace("\n", ", ") if address_tag else "N/A"
+        # List to store location details
+        locations = []
 
-        p = address_tag.find_all("p")
-        if len(p) < 2:
-            phone = "N/A"
-        else:
-            phone_tag = p[1] if address_tag else None
-            phone = phone_tag.text.strip() if phone_tag else "N/A"
+            # Iterate through each location and extract details
+        for location in location_containers:
+            name_tag = location.find("h4", class_="fusion-title-heading")
 
-        location_details = {
-            "Name": name,
-            "Address": address,
-            "Phone": phone,
-            "Website": link
-        }
+            if not name_tag:
+                continue
 
-        locations.append(location_details)
+            name = name_tag.text.strip()
 
-    return locations
+            print(name)
 
-locations = []
+            link_tag = name_tag.find("a") if name_tag else None
+            link = link_tag['href'] if link_tag else "N/A"
 
-for place in places:
-    locations = locations + get_details(place)
+            address_tag = location.find("div", class_="fusion-text")
 
-# Print the extracted locations
-for loc in locations:
-    print(loc)
+            address = address_tag.find("p").text.strip().replace("\n", ", ") if address_tag else "N/A"
 
-# Optional: Save the locations to a JSON file
-with open('locations.json', 'w') as f:
-    json.dump(locations, f, indent=4)
+            p = address_tag.find_all("p")
+            if len(p) < 2:
+                phone = "N/A"
+            else:
+                phone_tag = p[1] if address_tag else None
+                phone = phone_tag.text.strip() if phone_tag else "N/A"
+
+            location_details = {
+                "name": name,
+                "address": address,
+                "phone": phone,
+                "website": link,
+                "certification": "HFSAA"
+            }
+
+            locations.append(location_details)
+
+        return locations
+
+
+    def get_all_resturaunts(self):
+        print("Getting HFSAA resturaunts...")
+        zone_urls = self.get_zone_urls()
+        resturaunts = []
+
+        for zone_url in zone_urls:
+            resturaunts = resturaunts + self.get_zone_resturaunts(zone_url)
+
+        return resturaunts
