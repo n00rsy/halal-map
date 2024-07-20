@@ -1,11 +1,6 @@
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.options import Options
 import json
 
-import time
-import googlemaps
 
 class Hms:
     def __init__(self, driver):
@@ -13,30 +8,28 @@ class Hms:
 
 
     def get_all_resturaunts(self):
-        print("Getting HMS resturaunts...")
-        # Make the request to the API endpoint
-        self.driver.get("https://islamicservicesportal.org/api/Restaurants")
+        urls = ['https://islamicservicesportal.org/api/Retailers', "https://islamicservicesportal.org/api/Restaurants"]
+        locations = []
 
-        # Get the page source, which should contain the JSON response
-        page_source = self.driver.find_element(By.TAG_NAME, "pre").text
+        for url in urls:
+            print(f"Getting HMS... {url}")
+            self.driver.get(url)
 
-        # Parse the JSON response
-        data = json.loads(page_source)
+            # Get the page source, which should contain the JSON response
+            page_source = self.driver.find_element(By.TAG_NAME, "pre").text
+            data = json.loads(page_source)
 
-        reformatted_data = []
+            for location in data:
+                reformatted_location = {
+                    "name": location["Name"],
+                    "address": location["Address"],
+                    "phone": location["Phone"],
+                    "state": location["State"],
+                    "products": location["Products"],
+                    "expires": location["Expires"],
+                    "certification": "HMS"
+                }
+                print(reformatted_location['name'])
+                locations.append(reformatted_location)
 
-        for location in data:
-            # Extract relevant fields
-            reformatted_location = {
-                "name": location["Name"],
-                "address": location["Address"],
-                "phone": location["Phone"],
-                "state": location["State"],
-                "products": location["Products"],
-                "expires": location["Expires"],
-                "certification": "HMS"
-            }
-            print(reformatted_location['name'])
-            reformatted_data.append(reformatted_location)
-
-        return reformatted_data
+        return locations

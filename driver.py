@@ -6,7 +6,9 @@ import json
 import time
 import urllib
 
-GOOGLE_MAPS_API_KEY = ''
+GOOGLE_MAPS_API_KEY = 'AIzaSyBeQvkyGVlDbl91fEjxMBfgSwK7hIP4Slk'
+JSON_FILENAME = 'locations.json'
+HTML_FILENAME = 'index.html'
 
 def setup_selenium():
     # Set up Selenium WebDriver
@@ -92,7 +94,7 @@ def generate_html(resturaunts):
     '''
 
     # Save the HTML content to a file
-    with open('index.html', 'w') as f:
+    with open(HTML_FILENAME, 'w') as f:
         f.write(html_content)
 
     print("HTML file has been generated.")
@@ -127,7 +129,7 @@ def get_all_resturaunts():
     hfsaa = Hfsaa(driver)
     hms = Hms(driver)
 
-    resturaunts = hfsaa.get_all_resturaunts() + hms.get_all_resturaunts()
+    resturaunts = hms.get_all_resturaunts()
 
     driver.quit()
 
@@ -145,10 +147,10 @@ def get_all_resturaunts():
         except Exception as e:
             print(e)
 
-    save_dict_to_json(valid_resturaunts, 'locations.json')
+    save_dict_to_json(valid_resturaunts, JSON_FILENAME)
 
 def save_new_html():
-    with open('locations.json', 'r') as file:
+    with open(JSON_FILENAME, 'r') as file:
         resturaunts = json.load(file)
 
     # Iterate through the array of objects
@@ -161,5 +163,4 @@ if __name__ == '__main__':
 
     # get_all_resturaunts()
     save_new_html()
-    # Read the JSON file
 
