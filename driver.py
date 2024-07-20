@@ -74,6 +74,15 @@ def generate_html(resturaunts):
                 margin: 0;
                 padding: 0;
             }}
+            h3 {{
+            font-size: 1.5em;
+            }}
+            p {{
+                font-size: 1em;
+            }}
+            button {{
+                font-size: 1em;
+            }}
         </style>
     </head>
     <body onload="initMap()">
