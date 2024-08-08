@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <script async
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBeQvkyGVlDbl91fEjxMBfgSwK7hIP4Slk&loading=async&callback=initMap&libraries=marker">
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA8RSPEtTeT0oOyaZwhrv5gHmpUhA_EYxE&loading=async&callback=initMap&libraries=marker">
         </script>
 
     <script>
@@ -51,9 +51,15 @@
                             content += `</p>`
                         }
                         if (place.expires) {
-                            content += `<p><b>Expires:</b> ${place.expires}</p>`
+                            content += `<p><b>Expires:</b> ${formatDate(place.expires)}</p>`
                         }
-                        content += `<a href="${place.nav_url}" target="_blank" class="btn btn-primary">Navigate</a></div></div>`
+                        content += `<a href="${place.nav_url}" target="_blank" class="btn btn-primary float-start">Navigate</a>
+                        `
+                        if (place.website) {
+                            content += `<a href="${place.website}" target="_blank" class="btn btn-outline-secondary float-end">Website</a>
+                        `
+                        }
+                        content += `</div></div>`
                         let infoWindow = new google.maps.InfoWindow({
                             content: content,
                             headerDisabled: true
@@ -77,6 +83,22 @@
                     console.error('Error fetching JSON data:', error);
                 });
             getCurrentLocation()
+        }
+
+        function formatDate(dateString) {
+            // Create a new Date object from the input string
+            const date = new Date(dateString);
+
+            // Define an array of month names
+            const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+            // Extract the day, month, and year from the Date object
+            const day = date.getDate();
+            const month = monthNames[date.getMonth()];
+            const year = date.getFullYear();
+
+            // Format the date as "Mon DD, YYYY"
+            return `${month} ${day}, ${year}`;
         }
 
         function getCurrentLocation() {
