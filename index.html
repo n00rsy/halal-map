@@ -22,7 +22,7 @@
                 mapId: "HALAL_MAP"
             });
             let currentInfoWindow = null;
-            fetch('/locations.json')
+            fetch('locations.json')
                 .then(response => response.json())
                 .then(places => {
                     places.forEach(function (place) {
