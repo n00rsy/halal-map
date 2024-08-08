@@ -131,7 +131,7 @@ def get_all_resturaunts():
     hms = Hms(driver)
 
     resturaunts = hms.get_all_resturaunts()
-
+    resturaunts = resturaunts + hfsaa.get_all_resturaunts()
     driver.quit()
 
     geocoder = Geocoder(GOOGLE_MAPS_API_KEY)
@@ -147,6 +147,8 @@ def get_all_resturaunts():
             valid_resturaunts.append(resturaunt)
         except Exception as e:
             print(e)
+    # save cache for next time
+    geocoder.write_cache()
 
     save_dict_to_json(valid_resturaunts, JSON_FILENAME)
 
