@@ -25,7 +25,7 @@ class Hms:
                     "address": location["Address"],
                     "phone": location["Phone"],
                     "state": location["State"],
-                    "products": location["Products"],
+                    "products": location["Products"].split(),
                     "expires": location["Expires"],
                     "certification": "HMS"
                 }
