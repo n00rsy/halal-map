@@ -25,7 +25,7 @@ class Hms:
                     "address": location["Address"],
                     "phone": location["Phone"],
                     "state": location["State"],
-                    "products": location["Products"].split(),
+                    "products": self.split_text_custom(location["Products"]),
                     "expires": location["Expires"],
                     "certification": "HMS"
                 }
@@ -33,3 +33,11 @@ class Hms:
                 locations.append(reformatted_location)
 
         return locations
+
+    def split_text_custom(self, text):
+        placeholder = "SPECIAL_BAKERY_ITEMS"
+        modified_text = text.replace("All Bakery Items", placeholder)
+        tokens = modified_text.split()
+        tokens = [token.replace(placeholder, "All Bakery Items") for token in tokens]
+
+        return tokens
