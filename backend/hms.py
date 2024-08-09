@@ -15,7 +15,6 @@ class Hms:
             print(f"Getting HMS... {url}")
             self.driver.get(url)
 
-            # Get the page source, which should contain the JSON response
             page_source = self.driver.find_element(By.TAG_NAME, "pre").text
             data = json.loads(page_source)
 

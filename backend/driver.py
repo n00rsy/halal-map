@@ -1,12 +1,12 @@
 from selenium import webdriver
 from hfsaa import Hfsaa
 from hms import Hms
-from geocoder import Geocoder
+from gmaps_driver import GmapsDriver
 import json
 
 GOOGLE_MAPS_API_KEY = ''
-JSON_FILENAME = 'locations.json'
-GEOCODE_CACHE_FILENAME = 'geocode_cache.json'
+JSON_FILENAME = '../locations.json'
+GMAPS_CACHE_FILEPATH = 'gmaps_cache.json'
 HTML_FILENAME = 'index.html'
 
 def setup_selenium():
@@ -35,25 +35,24 @@ def get_all_resturaunts():
     resturaunts = resturaunts + hfsaa.get_all_resturaunts()
     driver.quit()
 
-    geocoder = Geocoder(GEOCODE_CACHE_FILENAME, GOOGLE_MAPS_API_KEY)
+    gmaps_driver = GmapsDriver(GMAPS_CACHE_FILEPATH, GOOGLE_MAPS_API_KEY)
 
     valid_resturaunts = []
     for resturaunt in resturaunts:
         try:
-            print(f'geocoding {resturaunt["name"]}...')
-            lat, lng = geocoder.geocode(resturaunt['address'])
+            print(f'processing {resturaunt["name"]}...')
+            placeid, lat, lng = gmaps_driver.geocode(resturaunt['address'])
             resturaunt['lat'] = lat
             resturaunt['lng'] = lng
-            resturaunt['nav_url'] = geocoder.generate_google_maps_url(resturaunt['address'])
+            resturaunt['nav_url'] = gmaps_driver.generate_google_maps_url(resturaunt['address'], placeid)
+
             valid_resturaunts.append(resturaunt)
         except Exception as e:
             print(e)
     # save cache for next time
-    geocoder.write_cache()
+    gmaps_driver.write_cache()
 
     save_dict_to_json(valid_resturaunts, JSON_FILENAME)
 
 if __name__ == '__main__':
-
     get_all_resturaunts()
-
