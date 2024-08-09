@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <script async
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBeQvkyGVlDbl91fEjxMBfgSwK7hIP4Slk&loading=async&callback=initMap&libraries=marker">
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA8RSPEtTeT0oOyaZwhrv5gHmpUhA_EYxE&loading=async&callback=initMap&libraries=marker">
         </script>
 
     <script>
@@ -19,6 +19,7 @@
             map = new google.maps.Map(document.getElementById('map'), {
                 zoom: 4,
                 center: { lat: 40.6683491, lng: -97.6131147 },
+                gestureHandling: "greedy",
                 mapId: "HALAL_MAP"
             });
             let currentInfoWindow = null;
@@ -26,17 +27,32 @@
                 .then(response => response.json())
                 .then(places => {
                     places.forEach(function (place) {
+
+                        const glyphImg = document.createElement("img");
+                        glyphImg.style.width = "10px"
+                        glyphImg.src = "/resturaunt.svg"
+                        const glyphSvgPinElement = new google.maps.marker.PinElement({
+                            glyph: glyphImg,
+                        });
+
                         let marker = new google.maps.marker.AdvancedMarkerElement({
                             position: { lat: place.lat, lng: place.lng },
                             map: map,
-                            title: place.name
+                            title: place.name,
+                            content: glyphSvgPinElement.element,
                         });
-                        console.log(place)
                         let content = `
-                        <div class="card border-0">
+                        <div class="card border-0" style="max-width: 23rem;">
                             <div class="card-body">
                                 <h4 class="card-title">${place.name}</h3>
-                                <h6 class="card-subtitle mb-2 text-muted">Certification: ${place.certification}</h6>
+                                <h6 class="card-subtitle mb-2 text-muted">Certification: ${place.certification}
+                                `
+                                if (place.expires && isDatePast(place.expires)) {
+                                    content += `<span class="badge badge-danger">Expired</span>
+                                `
+                                }
+
+                                content += `</h6>
                                 <br>
                                 <p><b>Address:</b> ${place.address}</p>`
                         if (place.phone) {
@@ -53,12 +69,12 @@
                         if (place.expires) {
                             content += `<p><b>Expires:</b> ${formatDate(place.expires)}</p>`
                         }
-                        content += `<a href="${place.nav_url}" target="_blank" class="btn btn-primary btn-block">Navigate</a>
-                        `
                         if (place.website) {
                             content += `<a href="${place.website}" target="_blank" class="btn btn-outline-secondary btn-block">Website</a>
                         `
                         }
+                        content += `<a href="${place.nav_url}" target="_blank" class="btn btn-primary btn-block">Navigate</a>
+                        `
                         content += `</div></div>`
                         let infoWindow = new google.maps.InfoWindow({
                             content: content,
@@ -101,6 +117,14 @@
             return `${month} ${day}, ${year}`;
         }
 
+        function isDatePast(dateString) {
+            // Get the current date as a string in the same format
+            const currentDate = new Date().toISOString().split(".")[0]; // Removes the milliseconds and timezone part
+
+            // Compare the strings directly
+            return dateString < currentDate;
+        }
+
         function getCurrentLocation() {
             if (Object.keys(currentPos).length != 0) {
                 map.setCenter(currentPos);
@@ -115,6 +139,8 @@
 
                     const pinGlyph = new google.maps.marker.PinElement({
                         glyphColor: "white",
+                        background: "blue",
+                        borderColor: "#ADD8E6"
                     });
                     const markerViewGlyph = new google.maps.marker.AdvancedMarkerElement({
                         map,
