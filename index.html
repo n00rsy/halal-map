@@ -8,18 +8,18 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <script async
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBeQvkyGVlDbl91fEjxMBfgSwK7hIP4Slk&loading=async&callback=initMap&libraries=marker">
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA8RSPEtTeT0oOyaZwhrv5gHmpUhA_EYxE&loading=async&callback=initMap&libraries=marker">
         </script>
 
     <script>
         let map;
-        let currentPos = {}
-
         function initMap() {
             map = new google.maps.Map(document.getElementById('map'), {
                 zoom: 4,
                 center: { lat: 40.6683491, lng: -97.6131147 },
                 gestureHandling: "greedy",
+                streetViewControl: false,
+                mapTypeControl: false,
                 mapId: "HALAL_MAP"
             });
             let currentInfoWindow = null;
@@ -27,7 +27,6 @@
                 .then(response => response.json())
                 .then(places => {
                     places.forEach(function (place) {
-
                         const glyphImg = document.createElement("img");
                         glyphImg.style.width = "10px"
                         glyphImg.src = "resturaunt.svg"
@@ -47,11 +46,11 @@
                                 <h4 class="card-title">${place.name}</h3>
                                 <h6 class="card-subtitle mb-2 text-muted">Certification: ${place.certification}
                                 `
-                                if (place.expires && isDatePast(place.expires)) {
-                                    content += `<span class="badge badge-danger">Expired</span>
+                        if (place.expires && isDatePast(place.expires)) {
+                            content += `<span class="badge badge-danger">Expired</span>
                                 `
-                                }
-                                content += `</h6>
+                        }
+                        content += `</h6>
                                 <br>
                                 <p><b>Address:</b> ${place.address}</p>`
                         if (place.phone) {
@@ -101,13 +100,8 @@
         }
 
         function formatDate(dateString) {
-            // Create a new Date object from the input string
             const date = new Date(dateString);
-
-            // Define an array of month names
             const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
-            // Extract the day, month, and year from the Date object
             const day = date.getDate();
             const month = monthNames[date.getMonth()];
             const year = date.getFullYear();
@@ -117,25 +111,17 @@
         }
 
         function isDatePast(dateString) {
-            // Get the current date as a string in the same format
-            const currentDate = new Date().toISOString().split(".")[0]; // Removes the milliseconds and timezone part
-
-            // Compare the strings directly
+            const currentDate = new Date().toISOString().split(".")[0];
             return dateString < currentDate;
         }
 
         function getCurrentLocation() {
-            if (Object.keys(currentPos).length != 0) {
-                map.setCenter(currentPos);
-                map.setZoom(10)
-            }
-            else if (navigator.geolocation) {
+            if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition((position) => {
-                    currentPos = {
+                    let currentPos = {
                         lat: position.coords.latitude,
                         lng: position.coords.longitude,
                     };
-
                     const pinGlyph = new google.maps.marker.PinElement({
                         glyphColor: "white",
                         background: "blue",
@@ -149,7 +135,10 @@
                     });
                     map.setCenter(currentPos);
                     map.setZoom(10)
-                });
+                },
+                    (error) => {
+                        alert(error)
+                    });
             }
         }
     </script>
@@ -175,7 +164,7 @@
             Halal Map
         </a>
         <button id="getCurrentLocationButton" class="btn btn-outline-success my-2 my-sm-0"
-            onclick="getCurrentLocation()">Get Current Location</button>
+            onclick="getCurrentLocation()">Locate Me!</button>
     </nav>
     <div class="container-fluid">
         <div class="row">
@@ -189,7 +178,6 @@
             </div>
         </div>
     </div>
-
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
         integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
         crossorigin="anonymous"></script>
