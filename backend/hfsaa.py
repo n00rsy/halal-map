@@ -1,5 +1,6 @@
 import time
 from bs4 import BeautifulSoup
+from titlecase import titlecase
 
 class Hfsaa:
     def __init__(self, driver):
@@ -43,7 +44,7 @@ class Hfsaa:
             print(name)
             location_details = {
                 "certification": "HFSAA",
-                "name": name
+                "name": titlecase(name)
             }
             link_tag = name_tag.find("a") if name_tag else None
             if link_tag:

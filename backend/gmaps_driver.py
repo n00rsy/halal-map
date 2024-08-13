@@ -21,14 +21,14 @@ class GmapsDriver:
 
         print("geocode cache miss: ", key)
         gmaps_result = self.gmaps.places(key)
-        print(gmaps_result)
-        if gmaps_result:
+        if gmaps_result['status'] == 'OK':
             placeid = gmaps_result['results'][0]['place_id']
             location = gmaps_result['results'][0]['geometry']['location']
             self.gmaps_cache[key] = (placeid, location['lat'], location['lng'])
 
             return (self.gmaps_cache[key])
         else:
+            print(gmaps_result)
             raise Exception(f"invalid key:{key}")
 
     def generate_google_maps_url(self, address, placeid):
