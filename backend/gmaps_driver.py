@@ -2,7 +2,7 @@
 import googlemaps
 import json
 import urllib
-
+import re
 class GmapsDriver:
     def __init__(self, gmaps_cache_filepath, API_KEY):
         self.gmaps_cache_filepath = gmaps_cache_filepath
@@ -10,17 +10,21 @@ class GmapsDriver:
             self.gmaps_cache = json.load(gmaps_cache_file)
         self.gmaps = googlemaps.Client(key=API_KEY)
 
+    def format_key(self, name, address):
+        return re.sub(r'\(.*?\)', '', f"{name} {address}").strip()
+
     def geocode(self, name, address):
-        key = f"{name} {address}"
+        key = self.format_key(name, address)
         if key in self.gmaps_cache:
             print("geocode cache hit: ", key)
             return self.gmaps_cache[key]
 
         print("geocode cache miss: ", key)
         gmaps_result = self.gmaps.places(key)
+        print(gmaps_result)
         if gmaps_result:
             placeid = gmaps_result['results'][0]['place_id']
-            location = gmaps_result[0]['geometry']['location']
+            location = gmaps_result['results'][0]['geometry']['location']
             self.gmaps_cache[key] = (placeid, location['lat'], location['lng'])
 
             return (self.gmaps_cache[key])

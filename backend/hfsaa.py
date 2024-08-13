@@ -42,7 +42,8 @@ class Hfsaa:
             name = name_tag.text.strip()
             print(name)
             location_details = {
-                "certification": "HFSAA"
+                "certification": "HFSAA",
+                "name": name
             }
             link_tag = name_tag.find("a") if name_tag else None
             if link_tag:
