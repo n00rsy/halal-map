@@ -19,6 +19,6 @@ jobs:
       - name: Install a new Chromium
         run: sudo apt install -y chromium-browser
       - name: Install all necessary packages
-        run: pip install requests beautifulsoup4 selenium titlecase googlemaps dotenv
+        run: pip install requests beautifulsoup4 selenium titlecase googlemaps
       - name: Run the scraping script
         run: python driver.py
