@@ -33,16 +33,21 @@ jobs:
           git fetch
       - name: Commit changes
         run: |-
-          git add locations.json
+          git add .
           timestamp=$(date -u)
           git commit -m "Latest data: ${timestamp}"
+      - name: Push to main
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: main
       - name: Checkout to pages branch
         run: |-
           git checkout pages
           git checkout main -- locations.json
           git add .
           git commit -m "sync"
-      - name: Push changes
+      - name: Push to pages
         uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
