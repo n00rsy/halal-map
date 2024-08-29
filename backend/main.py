@@ -14,6 +14,7 @@ GMAPS_CACHE_FILEPATH = os.getenv('GMAPS_CACHE_FILEPATH')
 def setup_selenium():
     # Set up Selenium WebDriver
     options = webdriver.ChromeOptions()
+    options.add_argument("--no-sandbox")
     options.headless = True  # Run Chrome in headless mode
     return webdriver.Chrome(options=options)
 
