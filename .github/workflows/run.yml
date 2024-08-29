@@ -34,7 +34,7 @@ jobs:
           git add locations.json
           touch test.txt
           git add test.txt
-          git commit -m "update" || exit 0
+          git commit -m 'update' || exit 0
           git checkout pages
           git checkout main -- locations.json test.txt
       - name: Push changes
