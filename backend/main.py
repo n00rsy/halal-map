@@ -28,7 +28,7 @@ def setup_selenium():
     ]
     for option in options:
         chrome_options.add_argument(option)
-    return webdriver.Chrome(service=chrome_service, options=options)
+    return webdriver.Chrome(service=chrome_service, options=chrome_options)
 
 
 def export_locations(locations, filename):
