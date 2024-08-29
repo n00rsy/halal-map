@@ -5,10 +5,7 @@ from gmaps_driver import GmapsDriver
 import json
 from datetime import datetime
 import os
-from dotenv import load_dotenv
-import sys
 
-load_dotenv()
 GMAPS_API_KEY = os.getenv('GMAPS_API_KEY')
 LOCATIONS_FILEPATH = os.getenv('LOCATIONS_FILEPATH')
 GMAPS_CACHE_FILEPATH = os.getenv('GMAPS_CACHE_FILEPATH')
@@ -62,7 +59,6 @@ def process_resturaunts(resturaunts):
     return valid_resturaunts
 
 if __name__ == '__main__':
-    print("\n".join(sys.argv))
     resturaunts = get_all_resturaunts()
     print(resturaunts)
     valid_resturaunts = process_resturaunts(resturaunts)
