@@ -13,10 +13,18 @@ GMAPS_CACHE_FILEPATH = os.getenv('GMAPS_CACHE_FILEPATH')
 
 def setup_selenium():
     # Set up Selenium WebDriver
-    options = webdriver.ChromeOptions()
-    options.add_argument("--no-sandbox")
-    options.add_argument("--remote-debugging-port=9222")
-    options.headless = True  # Run Chrome in headless mode
+    chrome_options = webdriver.ChromeOptions()
+    options = [
+    "--headless",
+    "--disable-gpu",
+    "--window-size=1920,1200",
+    "--ignore-certificate-errors",
+    "--disable-extensions",
+    "--no-sandbox",
+    "--disable-dev-shm-usage"
+    ]
+    for option in options:
+        chrome_options.add_argument(option)
     return webdriver.Chrome(options=options)
 
 
