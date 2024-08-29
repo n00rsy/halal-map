@@ -14,6 +14,8 @@ class GmapsDriver:
         return re.sub(r'\(.*?\)', '', f"{name} {address}").strip()
 
     def geocode(self, name, address):
+        if address.startswith("www."):
+            raise Exception(f"invalid address:{address}")
         key = self.format_key(name, address)
         if key in self.gmaps_cache:
             print("geocode cache hit: ", key)
