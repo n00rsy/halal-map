@@ -15,6 +15,7 @@ def setup_selenium():
     # Set up Selenium WebDriver
     options = webdriver.ChromeOptions()
     options.add_argument("--no-sandbox")
+    options.add_argument("--remote-debugging-port=9222")
     options.headless = True  # Run Chrome in headless mode
     return webdriver.Chrome(options=options)
 
