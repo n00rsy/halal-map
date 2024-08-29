@@ -1,4 +1,8 @@
 from selenium import webdriver
+from webdriver_manager.chrome import ChromeDriverManager
+from webdriver_manager.core.utils import ChromeType
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
 from hfsaa import Hfsaa
 from hms import Hms
 from gmaps_driver import GmapsDriver
@@ -10,10 +14,9 @@ GMAPS_API_KEY = os.getenv('GMAPS_API_KEY')
 LOCATIONS_FILEPATH = os.getenv('LOCATIONS_FILEPATH')
 GMAPS_CACHE_FILEPATH = os.getenv('GMAPS_CACHE_FILEPATH')
 
-
 def setup_selenium():
-    # Set up Selenium WebDriver
-    chrome_options = webdriver.ChromeOptions()
+    chrome_service = Service(ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install())
+    chrome_options = Options()
     options = [
     "--headless",
     "--disable-gpu",
@@ -25,7 +28,7 @@ def setup_selenium():
     ]
     for option in options:
         chrome_options.add_argument(option)
-    return webdriver.Chrome(options=options)
+    return webdriver.Chrome(service=chrome_service, options=options)
 
 
 def export_locations(locations, filename):

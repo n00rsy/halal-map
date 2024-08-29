@@ -19,7 +19,7 @@ jobs:
       - name: Install a new Chromium
         run: sudo apt install -y chromium-browser
       - name: Install all necessary packages
-        run: pip install requests beautifulsoup4 selenium titlecase googlemaps
+        run: pip install requests beautifulsoup4 pandas selenium titlecase googlemaps webdriver-manager
       - name: Run the scraping script
         env:
             LOCATIONS_FILEPATH: ${{ secrets.LOCATIONS_FILEPATH }}
