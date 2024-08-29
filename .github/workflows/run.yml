@@ -23,8 +23,8 @@ jobs:
       - name: Test env vars for python
         run: LOCATIONS_FILEPATH=${{ secrets.LOCATIONS_FILEPATH }} python -c 'import os;print(os.environ['LOCATIONS_FILEPATH'])'
       - name: Run the scraping script
+        env:
+            - LOCATIONS_FILEPATH: ${{ secrets.LOCATIONS_FILEPATH }}
+            - GMAPS_CACHE_FILEPATH: ${{ secrets.GMAPS_CACHE_FILEPATH }}
+            - GMAPS_API_KEY: ${{ secrets.GMAPS_API_KEY }}
         run: python backend/main.py
-        with:
-          - LOCATIONS_FILEPATH: ${{ secrets.LOCATIONS_FILEPATH }}
-          - GMAPS_CACHE_FILEPATH: ${{ secrets.GMAPS_CACHE_FILEPATH }}
-          - GMAPS_API_KEY: ${{ secrets.GMAPS_API_KEY }}
