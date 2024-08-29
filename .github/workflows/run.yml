@@ -29,12 +29,13 @@ jobs:
       - name: Commit changes
         run: |-
           git fetch
-          git config --local user.name "github-actions[bot]
+          git config --local user.name "github-actions[bot]"
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git add locations.json
           touch test.txt
           git add test.txt
-          git commit -m 'update' || exit 0
+          timestamp=$(date -u)
+          git commit -m "Latest data: ${timestamp}"
           git checkout pages
           git checkout main -- locations.json test.txt
       - name: Push changes
