@@ -20,5 +20,7 @@ jobs:
         run: sudo apt install -y chromium-browser
       - name: Install all necessary packages
         run: pip install requests beautifulsoup4 selenium titlecase googlemaps
+      - name: Test env vars for python
+        run: TEST_SECRET=${{ secrets.LOCATIONS_FILEPATH }} python -c 'import os;print(os.environ['LOCATIONS_FILEPATH'])
       - name: Run the scraping script
         run: python driver.py
