@@ -1,6 +1,8 @@
 import time
+
 from bs4 import BeautifulSoup
 from titlecase import titlecase
+
 
 class Hfsaa:
     def __init__(self, driver):

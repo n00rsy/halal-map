@@ -1,8 +1,11 @@
 
-import googlemaps
 import json
-import urllib
 import re
+import urllib
+
+import googlemaps
+
+
 class GmapsDriver:
     def __init__(self, gmaps_cache_filepath, API_KEY):
         self.gmaps_cache_filepath = gmaps_cache_filepath

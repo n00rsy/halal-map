@@ -1,6 +1,8 @@
-from selenium.webdriver.common.by import By
 import json
+
+from selenium.webdriver.common.by import By
 from titlecase import titlecase
+
 
 class Hms:
     def __init__(self, driver):

@@ -1,14 +1,15 @@
-from selenium import webdriver
-from webdriver_manager.chrome import ChromeDriverManager
-from webdriver_manager.core.os_manager import ChromeType
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.chrome.service import Service
+import json
+import os
+from datetime import datetime
+
+from gmaps_driver import GmapsDriver
 from hfsaa import Hfsaa
 from hms import Hms
-from gmaps_driver import GmapsDriver
-import json
-from datetime import datetime
-import os
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
+from webdriver_manager.core.os_manager import ChromeType
 
 GMAPS_API_KEY = os.getenv('GMAPS_API_KEY')
 LOCATIONS_FILEPATH = os.getenv('LOCATIONS_FILEPATH')
