@@ -20,24 +20,28 @@ jobs:
         run: sudo apt install -y chromium-browser
       - name: Install all necessary packages
         run: pip install requests beautifulsoup4 pandas selenium titlecase googlemaps webdriver-manager
-      # - name: Run the scraping script
-      #   env:
-      #       LOCATIONS_FILEPATH: ${{ secrets.LOCATIONS_FILEPATH }}
-      #       GMAPS_CACHE_FILEPATH: ${{ secrets.GMAPS_CACHE_FILEPATH }}
-      #       GMAPS_API_KEY: ${{ secrets.GMAPS_API_KEY }}
-      #   run: python backend/main.py
-      - name: Commit changes
+      - name: Run the scraping script
+        env:
+            LOCATIONS_FILEPATH: ${{ secrets.LOCATIONS_FILEPATH }}
+            GMAPS_CACHE_FILEPATH: ${{ secrets.GMAPS_CACHE_FILEPATH }}
+            GMAPS_API_KEY: ${{ secrets.GMAPS_API_KEY }}
+        run: python backend/main.py
+      - name: Set up git config
         run: |-
-          git fetch
           git config --local user.name "github-actions[bot]"
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch
+      - name: Commit changes
+        run: |-
           git add locations.json
-          touch test.txt
-          git add test.txt
           timestamp=$(date -u)
           git commit -m "Latest data: ${timestamp}"
+      - name: Checkout to pages branch
+        run: |-
           git checkout pages
-          git checkout main -- locations.json test.txt
+          git checkout main -- locations.json
+          git add .
+          git commit -m "sync"
       - name: Push changes
         uses: ad-m/github-push-action@master
         with:
