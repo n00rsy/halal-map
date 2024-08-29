@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Halal Map</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script async
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBeQvkyGVlDbl91fEjxMBfgSwK7hIP4Slk&loading=async&callback=initMap&libraries=marker">
+        </script>
+
+    <script>
+        let map;
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 4,
+                center: { lat: 40.6683491, lng: -97.6131147 },
+                gestureHandling: "greedy",
+                streetViewControl: false,
+                mapTypeControl: false,
+                mapId: "HALAL_MAP"
+            });
+            let currentInfoWindow = null;
+            fetch('locations.json')
+                .then(response => response.json())
+                .then(data => {
+                    data['places'].forEach(function (place) {
+                        const glyphImg = document.createElement("img");
+                        glyphImg.style.width = "10px"
+                        glyphImg.src = "resturaunt.svg"
+                        const glyphSvgPinElement = new google.maps.marker.PinElement({
+                            glyph: glyphImg,
+                        });
+
+                        let marker = new google.maps.marker.AdvancedMarkerElement({
+                            position: { lat: place.lat, lng: place.lng },
+                            map: map,
+                            title: place.name,
+                            content: glyphSvgPinElement.element,
+                        });
+                        let content = `
+                        <div class="card border-0" style="max-width: 23rem;">
+                            <div class="card-body">
+                                <h4 class="card-title">${place.name}</h3>
+                                <h6 class="card-subtitle mb-2 text-muted">Certification: ${place.certification}
+                                `
+                        if (place.expires && isDatePast(place.expires)) {
+                            content += `<span class="badge badge-danger">Expired</span>
+                                `
+                        }
+                        content += `</h6>
+                                <br>
+                                <p><b>Address:</b> ${place.address}</p>`
+                        if (place.phone) {
+                            content += `<p><b>Phone:</b> <a href="tel:${place.phone}"> ${place.phone}</a></p>`
+                        }
+                        if (place.products) {
+                            content += `<p><b>Products:</b>`
+                            place.products.forEach(product => {
+                                content += `<span class="badge badge-success">${product}</span>
+                                `
+                            })
+                            content += `</p>`
+                        }
+                        if (place.expires) {
+                            content += `<p><b>Expires:</b> ${formatDate(place.expires)}</p>`
+                        }
+                        if (place.website) {
+                            content += `<a href="${place.website}" target="_blank" class="btn btn-outline-secondary btn-block">Website</a>
+                        `
+                        }
+                        content += `<a href="${place.nav_url}" target="_blank" class="btn btn-primary btn-block">Navigate</a>
+                        `
+                        content += `</div></div>`
+                        let infoWindow = new google.maps.InfoWindow({
+                            content: content,
+                            headerDisabled: true
+                        });
+
+                        marker.addListener('click', function () {
+                            if (currentInfoWindow) {
+                                currentInfoWindow.close();
+                            }
+                            if (currentInfoWindow == infoWindow) {
+                                currentInfoWindow = null
+                            }
+                            else {
+                                infoWindow.open(map, marker);
+                                currentInfoWindow = infoWindow;
+                            }
+                        });
+                    });
+                    document.getElementById('last-updated').innerText = `Last updated: ${data['updated']}`
+                })
+                .catch(error => {
+                    console.error('Error fetching JSON data:', error);
+                });
+            getCurrentLocation()
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            const day = date.getDate();
+            const month = monthNames[date.getMonth()];
+            const year = date.getFullYear();
+
+            // Format the date as "Mon DD, YYYY"
+            return `${month} ${day}, ${year}`;
+        }
+
+        function isDatePast(dateString) {
+            const currentDate = new Date().toISOString().split(".")[0];
+            return dateString < currentDate;
+        }
+
+        function getCurrentLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition((position) => {
+                    let currentPos = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude,
+                    };
+                    const pinGlyph = new google.maps.marker.PinElement({
+                        glyphColor: "white",
+                        background: "blue",
+                        borderColor: "#00008B"
+                    });
+                    const markerViewGlyph = new google.maps.marker.AdvancedMarkerElement({
+                        map,
+                        position: currentPos,
+                        content: pinGlyph.element,
+                        title: "Your Location",
+                    });
+                    map.setCenter(currentPos);
+                    map.setZoom(10)
+                },
+                    (error) => {
+                        console.log(error.message)
+                    });
+            }
+        }
+    </script>
+    <style>
+        #map {
+            height: 75vh;
+            margin-top: 15px;
+            width: 100%;
+        }
+
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-light bg-light">
+        <a class="navbar-brand" href="#">
+            Halal Map
+        </a>
+        <button id="getCurrentLocationButton" class="btn btn-outline-success my-2 my-sm-0"
+            onclick="getCurrentLocation()">Locate Me!</button>
+    </nav>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col">
+                <div id="map"></div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <p id="last-updated">Last updated:</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <h3>This map shows all HMS and HFSAA certified halal resturaunts in the US.</h3>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>
