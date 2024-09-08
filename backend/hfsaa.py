@@ -21,15 +21,13 @@ class Hfsaa:
         # Find the container with zones
         zone_containers = soup.find_all("a", class_="fusion-column-anchor")
         for zone_container in zone_containers:
-            if 'href' in zone_container:
-                url = zone_container['href']
-                zone_urls.append(url)
+            url = zone_container['href']
+            zone_urls.append(url)
 
         zone_containers = soup.find_all("a", class_="icon-accountant-map")
         for zone_container in zone_containers:
-            if 'href' in zone_container:
-                url = zone_container['href']
-                zone_urls.append(url)
+            url = zone_container['href']
+            zone_urls.append(url)
         return zone_urls
 
 
@@ -74,6 +72,7 @@ class Hfsaa:
     def get_all_resturaunts(self):
         print("Getting HFSAA resturaunts...")
         zone_urls = self.get_zone_urls()
+        print("zone urls: ", zone_urls)
         resturaunts = []
 
         for zone_url in zone_urls:
