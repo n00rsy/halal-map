@@ -30,7 +30,7 @@ class GmapsDriver:
             placeid = gmaps_result['results'][0]['place_id']
             location = gmaps_result['results'][0]['geometry']['location']
             self.gmaps_cache[key] = (placeid, location['lat'], location['lng'])
-
+            print("got details: ", placeid, location)
             return (self.gmaps_cache[key])
         else:
             print(gmaps_result)
