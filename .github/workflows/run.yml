@@ -47,7 +47,7 @@ jobs:
       - name: Checkout to pages branch
         run: |-
           git checkout pages
-          git checkout main -- locations.json
+          git checkout main -- locations.json index.html
           git add .
           git commit -m "sync"
       - name: Push to pages
