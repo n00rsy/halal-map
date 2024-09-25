@@ -40,8 +40,12 @@
                             title: place.name,
                             content: glyphSvgPinElement.element,
                         });
+                        let identifier = place.nav_url.substring(48).replace(/[^a-zA-Z0-9]/g, '')
                         let content = `
                         <div class="card border-0" style="max-width: 23rem;">
+                            <button type="button" title="Close" id="close-btn-${identifier}" class="close" aria-label="Close" style="border: none; background: none; outline: none; position: absolute; top: 10px; right: 10px;">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
                             <div class="card-body">
                                 <h4 class="card-title">${place.name}</h3>
                                 <h6 class="card-subtitle mb-2 text-muted">Certification: ${place.certification}
@@ -78,6 +82,13 @@
                             content: content,
                             headerDisabled: true
                         });
+
+                        google.maps.event.addListenerOnce(infoWindow, 'domready', function () {
+                            document.getElementById(`close-btn-${identifier}`).addEventListener('click', function () {
+                                infoWindow.close();
+                                currentInfoWindow = null;
+                            });
+                        })
 
                         marker.addListener('click', function () {
                             if (currentInfoWindow) {
