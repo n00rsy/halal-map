@@ -34,10 +34,13 @@ def setup_selenium():
 
 
 def export_locations(locations, filename):
-    current_date = datetime.now().strftime("%b %d, %Y")
+    timestamp = datetime.now()
+    current_date = timestamp.strftime("%b %d, %Y")
     data = {
+        "timestamp": int(timestamp.timestamp()),
         "updated": current_date,
         "places": locations
+
     }
     with open(filename, 'w') as json_file:
         json.dump(data, json_file)
