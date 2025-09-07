@@ -40,7 +40,6 @@ def export_locations(locations, filename):
         "timestamp": int(timestamp.timestamp()),
         "updated": current_date,
         "places": locations
-
     }
     with open(filename, 'w') as json_file:
         json.dump(data, json_file)
