@@ -10,7 +10,6 @@
     <script async
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBeQvkyGVlDbl91fEjxMBfgSwK7hIP4Slk&loading=async&callback=initMap&libraries=marker">
         </script>
-
     <script>
         let map;
         function initMap() {
@@ -153,6 +152,14 @@
                     });
             }
         }
+    </script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-8HKTYQ2VP1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-8HKTYQ2VP1');
     </script>
     <style>
         #map {
