@@ -10,7 +10,6 @@
     <script async
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBeQvkyGVlDbl91fEjxMBfgSwK7hIP4Slk&loading=async&callback=initMap&libraries=marker">
         </script>
-
     <script>
         let map;
         function initMap() {
@@ -154,9 +153,17 @@
             }
         }
     </script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-8HKTYQ2VP1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-8HKTYQ2VP1');
+    </script>
     <style>
         #map {
-            height: 75vh;
+            height: 85vh;
             margin-top: 15px;
             width: 100%;
         }
@@ -171,68 +178,96 @@
 </head>
 
 <body>
-    <nav class="navbar navbar-light bg-light">
-        <a class="navbar-brand" href="#">
-            Halal Map
-        </a>
-        <button id="getCurrentLocationButton" class="btn btn-outline-success my-2 my-sm-0"
-            onclick="getCurrentLocation()">Locate Me!</button>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Halal Map</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarContent"
+            aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active" id="map-tab">
+                    <a class="nav-link" href="#" onclick="showTab('map-content')">Map</a>
+                </li>
+                <li class="nav-item" id="about-tab">
+                    <a class="nav-link" href="#" onclick="showTab('about-content')">About</a>
+                </li>
+            </ul>
+            <button id="getCurrentLocationButton" class="btn btn-outline-success my-2 my-sm-0"
+                onclick="getCurrentLocation()">Locate Me!</button>
+        </div>
     </nav>
     <div class="container-fluid">
-        <div class="row">
-            <div class="col">
-                <div id="map"></div>
+        <div id="map-content">
+            <div class="row">
+                <div class="col">
+                    <div id="map"></div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md">
+                    <p id="last-updated">Last updated:</p>
+                </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-md">
-                <p id="last-updated">Last updated:</p>
-            </div>
-        </div>
-        <div class="row justify-content-center">
-            <div class="col-12 col-md-10 col-lg-8">
-                <h3>Find Halal-Certified Restaurants Near You 🍔</h3>
-                <p>
-                    This map pulls the latest data from HMS (Halal Monitoring Services) and HFSAA (Halal Food Standards
-                    Alliance of America) daily, ensuring that you have up-to-date information on certified Halal
-                    restaurants across the U.S. Simply click on the pins to explore!
-                </p>
-            </div>
-        </div>
-        <div class="row justify-content-center mt-4">
-            <div class="col-12 col-md-10 col-lg-8">
-                <h4>What is Halal? 🤔</h4>
-                <p>
-                    In regards to food, Halal refers to the set of standards that deem a product permissible under
-                    Islamic law. This includes specific guidelines
-                    for how animals are slaughtered, how food is prepared, and ensuring the absence of prohibited
-                    ingredients like pork or alcohol.
-                </p>
-            </div>
-            <div class="col-12 col-md-10 col-lg-8">
-                <h4>About HMS and HFSAA ℹ️</h4>
-                <p><strong>HMS (Halal Monitoring Services):</strong> a non-profit branch of the Shariah Board of
-                    America, is run by an independent team of experienced Ulama, certifying and monitoring
-                    hand-slaughtered Halal meat across the supply chain in over 13 U.S. states, ensuring adherence to
-                    Zabiha Halal principles and offering its services free of charge since 2005.</p>
-                <p><strong>HFSAA (Halal Food Standards Alliance of America):</strong> a non-profit Halal certification
-                    organization that ensures a high standard of Halal compliance across the entire supply chain,
-                    including meat, foods, cosmetics, and chemicals, accommodating various Islamic views on Halal. With
-                    extensive research across 15 U.S. states and multiple countries, HFSAA certifies practices such as
-                    hand slaughter by Muslim slaughterers, Tasmiya on each animal, and ensures non-meat products are
-                    free of most alcohol and animal byproducts.</p>
-            </div>
-            <div class="col-12 col-md-10 col-lg-8">
-                <h4>Verifying Certification</h4>
-                <p>
-                    <strong>Check for Certification Labels:</strong> Look for visible HMS or HFSAA certification
-                    labels at the establishment.
-                </p>
-                <p>
-                    <strong>Visit Official Websites:</strong> For the most current information, visit the <a
-                        href="https://www.hmsusa.org/certified-listing.html">HMS website</a> or the <a
-                        href="https://www.hfsaa.org/restaurants/">HFSAA website</a>.
-                </p>
+        <div id="about-content" style="display: none;">
+            <div class="row justify-content-center mt-4">
+                <div class="col-12 col-md-10 col-lg-8">
+                    <h1>About Halal Map</h1>
+                    <br>
+                    <h3>Find Halal-Certified Restaurants Near You 🍔</h3>
+                    <p>
+                        This map pulls the latest data from HMS (Halal Monitoring Services) and HFSAA (Halal Food
+                        Standards
+                        Alliance of America) daily, ensuring that you have up-to-date information on certified Halal
+                        restaurants across the U.S. Simply click on the pins to explore!
+                    </p>
+                </div>
+                <div class="col-12 col-md-10 col-lg-8">
+                    <h4>What is Halal? 🤔</h4>
+                    <p>
+                        In regards to food, Halal refers to the set of standards that deem a product permissible under
+                        Islamic law. This includes specific guidelines
+                        for how animals are slaughtered, how food is prepared, and ensuring the absence of prohibited
+                        ingredients like pork or alcohol.
+                    </p>
+                </div>
+                <div class="col-12 col-md-10 col-lg-8">
+                    <h4>About HMS and HFSAA ℹ️</h4>
+                    <p><strong>HMS (Halal Monitoring Services):</strong> a non-profit branch of the Shariah Board of
+                        America, is run by an independent team of experienced Ulama, certifying and monitoring
+                        hand-slaughtered Halal meat across the supply chain in over 13 U.S. states, ensuring adherence
+                        to
+                        Zabiha Halal principles and offering its services free of charge since 2005.</p>
+                    <p><strong>HFSAA (Halal Food Standards Alliance of America):</strong> a non-profit Halal
+                        certification
+                        organization that ensures a high standard of Halal compliance across the entire supply chain,
+                        including meat, foods, cosmetics, and chemicals, accommodating various Islamic views on Halal.
+                        With
+                        extensive research across 15 U.S. states and multiple countries, HFSAA certifies practices such
+                        as
+                        hand slaughter by Muslim slaughterers, Tasmiya on each animal, and ensures non-meat products are
+                        free of most alcohol and animal byproducts.</p>
+                </div>
+                <div class="col-12 col-md-10 col-lg-8">
+                    <h4>Verifying Certification</h4>
+                    <p>
+                        <strong>Check for Certification Labels:</strong> Look for visible HMS or HFSAA certification
+                        labels at the establishment.
+                    </p>
+                    <p>
+                        <strong>Visit Official Websites:</strong> For the most current information, visit the <a
+                            href="https://www.hmsusa.org/certified-listing.html">HMS website</a> or the <a
+                            href="https://www.hfsaa.org/restaurants/">HFSAA website</a>.
+                    </p>
+                </div>
+                <div class="col-12 col-md-10 col-lg-8">
+
+                    <script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js"
+                        data-name="bmc-button" data-slug="n00rsy" data-color="#40DCA5" data-emoji="☕" data-font="Cookie"
+                        data-text="Buy me a coffee" data-outline-color="#000000" data-font-color="#ffffff"
+                        data-coffee-color="#FFDD00"></script>
+                </div>
             </div>
         </div>
     </div>
@@ -245,6 +280,26 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js"
         integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
         crossorigin="anonymous"></script>
+    <script>
+        function showTab(tabId) {
+            // Hide all content
+            document.getElementById('map-content').style.display = 'none';
+            document.getElementById('about-content').style.display = 'none';
+
+            // Show selected content
+            document.getElementById(tabId).style.display = 'block';
+
+            // Update active tab
+            document.getElementById('map-tab').classList.remove('active');
+            document.getElementById('about-tab').classList.remove('active');
+
+            if (tabId === 'map-content') {
+                document.getElementById('map-tab').classList.add('active');
+            } else if (tabId === 'about-content') {
+                document.getElementById('about-tab').classList.add('active');
+            }
+        }
+    </script>
 </body>
 
 </html>
