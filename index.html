@@ -165,7 +165,7 @@
         #map {
             height: 75vh;
             margin-top: 15px;
-            width: 98%;
+            width: calc(100% - 2em);
             margin-left: auto;
             margin-right: auto;
         }
@@ -216,7 +216,7 @@
                 </div>
             </div>
         </div>
-        <div id="about-content" style="display: none;">
+        <div id="about-content" style="display: none; padding-bottom: 7em">
             <div class="row justify-content-center mt-4">
                 <div class="col-12 col-md-10 col-lg-8">
                     <h1>About Halal Map</h1>
@@ -291,6 +291,7 @@
             // Hide all content
             document.getElementById('map-content').style.display = 'none';
             document.getElementById('about-content').style.display = 'none';
+            document.getElementById('getCurrentLocationButton').style.display = tabId == 'map-content' ? 'block' : 'none';
 
             // Show selected content
             document.getElementById(tabId).style.display = 'block';
