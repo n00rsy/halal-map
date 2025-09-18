@@ -7,11 +7,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
     <script async
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBeQvkyGVlDbl91fEjxMBfgSwK7hIP4Slk&loading=async&callback=initMap&libraries=marker">
         </script>
     <script>
         let map;
+        let locationsData = [];
+        let fuse;
+        let currentSortColumn = '';
+        let currentSortDirection = 'asc';
+        let markersMap = new Map(); // Store markers by location identifier
+        let infoWindowsMap = new Map(); // Store info windows by location identifier
+        let currentInfoWindow = null; // Track currently open info window
+
+        // Pagination variables
+        let currentPage = 1;
+        const itemsPerPage = 20;
+        let filteredData = [];
+
         function initMap() {
             map = new google.maps.Map(document.getElementById('map'), {
                 zoom: 4,
@@ -21,10 +35,20 @@
                 mapTypeControl: false,
                 mapId: "HALAL_MAP"
             });
-            let currentInfoWindow = null;
             fetch('locations.json')
                 .then(response => response.json())
                 .then(data => {
+                    locationsData = data['places'];
+                    // Initialize Fuse.js for fuzzy search
+                    fuse = new Fuse(locationsData, {
+                        keys: ['name', 'address', 'state', 'phone', 'certification'],
+                        threshold: 0.3,
+                        includeScore: true
+                    });
+
+                    // Populate the table
+                    populateTable(locationsData);
+
                     data['places'].forEach(function (place) {
                         const glyphImg = document.createElement("img");
                         glyphImg.style.width = "10px"
@@ -39,7 +63,10 @@
                             title: place.name,
                             content: glyphSvgPinElement.element,
                         });
-                        let identifier = place.nav_url.substring(48).replace(/[^a-zA-Z0-9]/g, '')
+                        let identifier = place.nav_url.substring(48).replace(/[^a-zA-Z0-9]/g, '');
+
+                        // Store marker reference
+                        markersMap.set(identifier, marker);
                         let content = `
                         <div class="card border-0" style="max-width: 23rem;">
                             <button type="button" title="Close" id="close-btn-${identifier}" class="close" aria-label="Close" style="border: none; background: none; outline: none; position: absolute; top: 10px; right: 10px;">
@@ -81,6 +108,9 @@
                             content: content,
                             headerDisabled: true
                         });
+
+                        // Store info window reference
+                        infoWindowsMap.set(identifier, infoWindow);
 
                         google.maps.event.addListenerOnce(infoWindow, 'domready', function () {
                             document.getElementById(`close-btn-${identifier}`).addEventListener('click', function () {
@@ -152,6 +182,243 @@
                     });
             }
         }
+
+        function populateTable(data) {
+            // Store the filtered data for pagination
+            filteredData = data;
+
+            // Calculate pagination
+            const totalPages = Math.ceil(data.length / itemsPerPage);
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const paginatedData = data.slice(startIndex, endIndex);
+
+            const tableBody = document.getElementById('locations-table-body');
+            tableBody.innerHTML = '';
+
+            paginatedData.forEach(location => {
+                const row = document.createElement('tr');
+                row.style.cursor = 'pointer';
+                row.title = 'Click to view on map';
+
+                // Create identifier for this location (same as used in marker creation)
+                const identifier = location.nav_url.substring(48).replace(/[^a-zA-Z0-9]/g, '');
+
+                // Add click handler to show location on map and open info window
+                row.addEventListener('click', () => {
+                    map.setCenter({ lat: location.lat, lng: location.lng });
+                    map.setZoom(15);
+
+                    // Close any currently open info window
+                    if (currentInfoWindow) {
+                        currentInfoWindow.close();
+                    }
+
+                    // Open the info window for this location
+                    const marker = markersMap.get(identifier);
+                    const infoWindow = infoWindowsMap.get(identifier);
+
+                    if (marker && infoWindow) {
+                        infoWindow.open(map, marker);
+                        currentInfoWindow = infoWindow;
+                    }
+
+                    // Scroll to top to show the map
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+
+                // Name
+                const nameCell = document.createElement('td');
+                if (location.website) {
+                    const nameLink = document.createElement('a');
+                    nameLink.href = location.website;
+                    nameLink.target = '_blank';
+                    nameLink.textContent = location.name;
+                    nameLink.style.color = '#007bff';
+                    nameLink.style.textDecoration = 'none';
+                    // Prevent row click when clicking the name link
+                    nameLink.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                    });
+                    nameCell.appendChild(nameLink);
+                } else {
+                    nameCell.textContent = location.name;
+                }
+                row.appendChild(nameCell);
+
+                // Certification
+                const certificationCell = document.createElement('td');
+                certificationCell.textContent = location.certification || 'N/A';
+                row.appendChild(certificationCell);
+
+                // Address
+                const addressCell = document.createElement('td');
+                addressCell.textContent = location.address;
+                row.appendChild(addressCell);
+
+                tableBody.appendChild(row);
+            });
+
+            // Update results count and pagination
+            updateResultsCount(data.length, paginatedData.length);
+            updatePaginationControls(totalPages);
+        }
+
+        function updateResultsCount(totalCount, displayedCount) {
+            const countElement = document.getElementById('results-count');
+            if (countElement) {
+                if (totalCount === displayedCount) {
+                    countElement.textContent = `Showing ${totalCount} restaurant${totalCount !== 1 ? 's' : ''}`;
+                } else {
+                    const startIndex = (currentPage - 1) * itemsPerPage + 1;
+                    const endIndex = Math.min(currentPage * itemsPerPage, totalCount);
+                    countElement.textContent = `Showing ${startIndex}-${endIndex} of ${totalCount} restaurant${totalCount !== 1 ? 's' : ''}`;
+                }
+            }
+        }
+
+        function updatePaginationControls(totalPages) {
+            const paginationElement = document.getElementById('pagination-controls');
+            if (!paginationElement) return;
+
+            paginationElement.innerHTML = '';
+
+            if (totalPages <= 1) {
+                paginationElement.style.display = 'none';
+                return;
+            }
+
+            paginationElement.style.display = 'flex';
+
+            // Previous button
+            const prevButton = document.createElement('button');
+            prevButton.className = `btn btn-sm ${currentPage === 1 ? 'btn-secondary disabled' : 'btn-outline-primary'}`;
+            prevButton.innerHTML = '&laquo;';
+            prevButton.title = 'Previous';
+            prevButton.disabled = currentPage === 1;
+            prevButton.onclick = () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    populateTable(filteredData);
+                }
+            };
+            paginationElement.appendChild(prevButton);
+
+            // Calculate which page numbers to show (max 3: previous, current, next)
+            const pagesToShow = [];
+
+            // Always include current page
+            pagesToShow.push(currentPage);
+
+            // Add previous page if exists
+            if (currentPage > 1) {
+                pagesToShow.unshift(currentPage - 1);
+            }
+
+            // Add next page if exists
+            if (currentPage < totalPages) {
+                pagesToShow.push(currentPage + 1);
+            }
+
+            // Create page number buttons
+            pagesToShow.forEach(pageNum => {
+                const pageButton = document.createElement('button');
+                pageButton.className = `btn btn-sm ${pageNum === currentPage ? 'btn-primary' : 'btn-outline-primary'}`;
+                pageButton.textContent = pageNum;
+                pageButton.onclick = () => {
+                    currentPage = pageNum;
+                    populateTable(filteredData);
+                };
+                paginationElement.appendChild(pageButton);
+            });
+
+            // Next button
+            const nextButton = document.createElement('button');
+            nextButton.className = `btn btn-sm ${currentPage === totalPages ? 'btn-secondary disabled' : 'btn-outline-primary'}`;
+            nextButton.innerHTML = '&raquo;';
+            nextButton.title = 'Next';
+            nextButton.disabled = currentPage === totalPages;
+            nextButton.onclick = () => {
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    populateTable(filteredData);
+                }
+            };
+            paginationElement.appendChild(nextButton);
+        }
+
+        function filterTable() {
+            const searchInput = document.getElementById('search-input').value.trim();
+
+            // Reset to first page when filtering
+            currentPage = 1;
+
+            if (searchInput === '') {
+                populateTable(locationsData);
+                return;
+            }
+
+            const results = fuse.search(searchInput);
+            const filteredData = results.map(result => result.item);
+            populateTable(filteredData);
+        }
+
+        function sortTable(column) {
+            // Reset to first page when sorting
+            currentPage = 1;
+
+            // Toggle sort direction if clicking the same column
+            if (currentSortColumn === column) {
+                currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSortDirection = 'asc';
+                currentSortColumn = column;
+            }
+
+            // Update sort indicators
+            updateSortIndicators(column);
+
+            const searchInput = document.getElementById('search-input').value.trim();
+            let dataToSort;
+
+            if (searchInput === '') {
+                dataToSort = [...locationsData];
+            } else {
+                const results = fuse.search(searchInput);
+                dataToSort = results.map(result => result.item);
+            }
+
+            dataToSort.sort((a, b) => {
+                let aValue = a[column] || '';
+                let bValue = b[column] || '';
+
+                if (typeof aValue === 'string') {
+                    aValue = aValue.toLowerCase();
+                    bValue = bValue.toLowerCase();
+                }
+
+                if (currentSortDirection === 'asc') {
+                    return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+                } else {
+                    return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
+                }
+            });
+
+            populateTable(dataToSort);
+        }
+
+        function updateSortIndicators(column) {
+            // Remove all existing sort indicators
+            document.querySelectorAll('.sort-indicator').forEach(indicator => {
+                indicator.textContent = '';
+            });
+
+            // Add sort indicator to current column
+            const indicator = document.getElementById(`sort-${column}`);
+            if (indicator) {
+                indicator.textContent = currentSortDirection === 'asc' ? ' ↑' : ' ↓';
+            }
+        }
     </script>
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-8HKTYQ2VP1"></script>
     <script>
@@ -165,9 +432,6 @@
         #map {
             height: 75vh;
             margin-top: 15px;
-            width: calc(100% - 2em);
-            margin-left: auto;
-            margin-right: auto;
         }
 
         html,
@@ -175,6 +439,81 @@
             height: 100%;
             margin: 0;
             padding: 0;
+        }
+
+        .sort-indicator {
+            font-size: 0.8em;
+            color: #007bff;
+        }
+
+        .table th {
+            user-select: none;
+        }
+
+        .table th:hover {
+            background-color: #495057;
+        }
+
+        .table tbody tr:hover {
+            background-color: #e3f2fd !important;
+            cursor: pointer;
+        }
+
+        .table tbody td a:hover {
+            text-decoration: underline !important;
+        }
+
+        #search-input {
+            max-width: 100%;
+        }
+
+        .table-responsive {
+            height: 600px;
+            overflow-y: auto;
+        }
+
+        @media (max-width: 768px) {
+            .table-responsive {
+                height: 400px;
+            }
+        }
+
+        #pagination-controls {
+            gap: 0.25rem;
+        }
+
+        #pagination-controls .btn {
+            min-width: 35px;
+            height: 32px;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+            line-height: 1.2;
+            border-radius: 0.25rem;
+        }
+
+        #pagination-controls .btn:first-child {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+
+        #pagination-controls .btn:last-child {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+
+        #pagination-controls .btn:not(:first-child):not(:last-child) {
+            border-radius: 0;
+            border-left: 0;
+        }
+
+        #pagination-controls .btn+.btn {
+            margin-left: -1px;
+        }
+
+        @media (max-width: 767px) {
+            .mobile-spacing {
+                margin-top: 0.75rem;
+            }
         }
     </style>
 </head>
@@ -199,81 +538,109 @@
                 onclick="getCurrentLocation()">Locate Me!</button>
         </div>
     </nav>
-    <div class="container-fluid">
+    <div class="container">
         <div id="map-content">
-            <div class="row justify-content-center mt-4">
-                <div class="col-12 col-md-10 col-lg-8">
-                    <h1>USA Halal Certified Restaurants</h1>
-                    <p>Click on the pins to explore!</p>
-                </div>
+            <div class="mt-4">
+                <h1>USA Halal Certified Restaurants</h1>
+                <p>Click on the pins to explore!</p>
             </div>
-            <div class="row">
-                <div id="map"></div>
-            </div>
-            <div class="row">
-                <div class="col-md">
-                    <p id="last-updated">Last updated:</p>
-                </div>
-            </div>
-        </div>
-        <div id="about-content" style="display: none; padding-bottom: 7em">
-            <div class="row justify-content-center mt-4">
-                <div class="col-12 col-md-10 col-lg-8">
-                    <h1>About Halal Map</h1>
-                    <br>
-                    <h3>Find Halal-Certified Restaurants Near You 🍔</h3>
-                    <p>
-                        This map pulls the latest data from HMS (Halal Monitoring Services) and HFSAA (Halal Food
-                        Standards
-                        Alliance of America) daily, ensuring that you have up-to-date information on certified Halal
-                        restaurants across the U.S. Simply click on the pins to explore!
-                    </p>
-                </div>
-                <div class="col-12 col-md-10 col-lg-8">
-                    <h4>What is Halal? 🤔</h4>
-                    <p>
-                        In regards to food, Halal refers to the set of standards that deem a product permissible under
-                        Islamic law. This includes specific guidelines
-                        for how animals are slaughtered, how food is prepared, and ensuring the absence of prohibited
-                        ingredients like pork or alcohol.
-                    </p>
-                </div>
-                <div class="col-12 col-md-10 col-lg-8">
-                    <h4>About HMS and HFSAA ℹ️</h4>
-                    <p><strong>HMS (Halal Monitoring Services):</strong> a non-profit branch of the Shariah Board of
-                        America, is run by an independent team of experienced Ulama, certifying and monitoring
-                        hand-slaughtered Halal meat across the supply chain in over 13 U.S. states, ensuring adherence
-                        to
-                        Zabiha Halal principles and offering its services free of charge since 2005.</p>
-                    <p><strong>HFSAA (Halal Food Standards Alliance of America):</strong> a non-profit Halal
-                        certification
-                        organization that ensures a high standard of Halal compliance across the entire supply chain,
-                        including meat, foods, cosmetics, and chemicals, accommodating various Islamic views on Halal.
-                        With
-                        extensive research across 15 U.S. states and multiple countries, HFSAA certifies practices such
-                        as
-                        hand slaughter by Muslim slaughterers, Tasmiya on each animal, and ensures non-meat products are
-                        free of most alcohol and animal byproducts.</p>
-                </div>
-                <div class="col-12 col-md-10 col-lg-8">
-                    <h4>Verifying Certification</h4>
-                    <p>
-                        <strong>Check for Certification Labels:</strong> Look for visible HMS or HFSAA certification
-                        labels at the establishment.
-                    </p>
-                    <p>
-                        <strong>Visit Official Websites:</strong> For the most current information, visit the <a
-                            href="https://www.hmsusa.org/certified-listing.html">HMS website</a> or the <a
-                            href="https://www.hfsaa.org/restaurants/">HFSAA website</a>.
-                    </p>
-                </div>
-                <div class="col-12 col-md-10 col-lg-8">
 
-                    <script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js"
-                        data-name="bmc-button" data-slug="n00rsy" data-color="#40DCA5" data-emoji="☕" data-font="Cookie"
-                        data-text="Buy me a coffee" data-outline-color="#000000" data-font-color="#ffffff"
-                        data-coffee-color="#FFDD00"></script>
+            <div id="map"></div>
+
+            <!-- Locations Table Section -->
+            <div class="mt-4">
+                <h2>Restaurant Locations</h2>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <input type="text" id="search-input" class="form-control"
+                            placeholder="Search by name, address, city, state, phone, or certification..."
+                            onkeyup="filterTable()">
+                    </div>
+                    <div class="col-md-6 d-flex align-items-center mobile-spacing">
+                        <small class="text-muted ml-3">💡 Click any row to view location on map</small>
+                    </div>
                 </div>
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th scope="col" style="cursor: pointer;" onclick="sortTable('name')">
+                                    Name<span id="sort-name" class="sort-indicator"></span>
+                                </th>
+                                <th scope="col" style="cursor: pointer;" onclick="sortTable('certification')">
+                                    Certification<span id="sort-certification" class="sort-indicator"></span>
+                                </th>
+                                <th scope="col">
+                                    Address
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="locations-table-body">
+                            <!-- Table rows will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination Controls -->
+                <div id="pagination-controls" class="d-flex justify-content-center align-items-center mt-3"
+                    style="display: none;"></div>
+            </div>
+            <small id="results-count" class="text-muted">Loading...</small>
+            <br>
+            <small id="last-updated" class="text-muted">Last updated:</small>
+
+        </div>
+        <div id="about-content" style="display: none;">
+            <div class="mt-4">
+                <h1>About Halal Map</h1>
+                <br>
+                <h3>Find Halal-Certified Restaurants Near You 🍔</h3>
+                <p>
+                    This map pulls the latest data from HMS (Halal Monitoring Services) and HFSAA (Halal Food
+                    Standards
+                    Alliance of America) daily, ensuring that you have up-to-date information on certified Halal
+                    restaurants across the U.S. Simply click on the pins to explore!
+                </p>
+
+                <h4>What is Halal? 🤔</h4>
+                <p>
+                    In regards to food, Halal refers to the set of standards that deem a product permissible under
+                    Islamic law. This includes specific guidelines
+                    for how animals are slaughtered, how food is prepared, and ensuring the absence of prohibited
+                    ingredients like pork or alcohol.
+                </p>
+
+                <h4>About HMS and HFSAA ℹ️</h4>
+                <p><strong>HMS (Halal Monitoring Services):</strong> a non-profit branch of the Shariah Board of
+                    America, is run by an independent team of experienced Ulama, certifying and monitoring
+                    hand-slaughtered Halal meat across the supply chain in over 13 U.S. states, ensuring adherence
+                    to
+                    Zabiha Halal principles and offering its services free of charge since 2005.</p>
+                <p><strong>HFSAA (Halal Food Standards Alliance of America):</strong> a non-profit Halal
+                    certification
+                    organization that ensures a high standard of Halal compliance across the entire supply chain,
+                    including meat, foods, cosmetics, and chemicals, accommodating various Islamic views on Halal.
+                    With
+                    extensive research across 15 U.S. states and multiple countries, HFSAA certifies practices such
+                    as
+                    hand slaughter by Muslim slaughterers, Tasmiya on each animal, and ensures non-meat products are
+                    free of most alcohol and animal byproducts.</p>
+
+                <h4>Verifying Certification</h4>
+                <p>
+                    <strong>Check for Certification Labels:</strong> Look for visible HMS or HFSAA certification
+                    labels at the establishment.
+                </p>
+                <p>
+                    <strong>Visit Official Websites:</strong> For the most current information, visit the <a
+                        href="https://www.hmsusa.org/certified-listing.html">HMS website</a> or the <a
+                        href="https://www.hfsaa.org/restaurants/">HFSAA website</a>.
+                </p>
+
+                <script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js"
+                    data-name="bmc-button" data-slug="n00rsy" data-color="#40DCA5" data-emoji="☕" data-font="Cookie"
+                    data-text="Buy me a coffee" data-outline-color="#000000" data-font-color="#ffffff"
+                    data-coffee-color="#FFDD00"></script>
             </div>
         </div>
     </div>
@@ -291,7 +658,6 @@
             // Hide all content
             document.getElementById('map-content').style.display = 'none';
             document.getElementById('about-content').style.display = 'none';
-            document.getElementById('getCurrentLocationButton').style.display = tabId == 'map-content' ? 'block' : 'none';
 
             // Show selected content
             document.getElementById(tabId).style.display = 'block';
