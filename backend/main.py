@@ -66,6 +66,12 @@ def get_all_resturaunts():
     hms_resturaunts = hms.get_all_resturaunts()
     hfsaa_resturaunts = hfsaa.get_all_resturaunts()
     driver.quit()
+
+    if len(hms_resturaunts) == 0:
+        raise Exception("Error: No HMS resturaunts found!")
+    if len(hfsaa_resturaunts) == 0:
+        raise Exception("Error: No HFSAA resturaunts found!")
+    
     return hms_resturaunts + hfsaa_resturaunts
 
 

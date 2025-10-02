@@ -22,7 +22,7 @@ class Hms:
 
             for location in data:
                 reformatted_location = {
-                    "name": titlecase(location["Name"]),
+                    "name": titlecase(location["Name"]).strip(),
                     "address": location["Address"],
                     "phone": location["Phone"],
                     "state": location["State"],
