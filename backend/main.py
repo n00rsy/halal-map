@@ -9,7 +9,6 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
-from webdriver_manager.core.os_manager import ChromeType
 
 GMAPS_API_KEY = os.getenv('GMAPS_API_KEY')
 LOCATIONS_FILEPATH = os.getenv('LOCATIONS_FILEPATH')
@@ -17,19 +16,31 @@ GMAPS_CACHE_FILEPATH = os.getenv('GMAPS_CACHE_FILEPATH')
 
 
 def setup_selenium():
-    chrome_service = Service(ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install())
+    chrome_service = Service(ChromeDriverManager().install())
     chrome_options = Options()
     options = [
-    "--headless",
-    "--disable-gpu",
     "--window-size=1920,1200",
     "--ignore-certificate-errors",
     "--disable-extensions",
     "--no-sandbox",
-    "--disable-dev-shm-usage"
+    "--disable-dev-shm-usage",
+    "--disable-blink-features=AutomationControlled",
+    "--disable-web-security",
+    "--allow-running-insecure-content"
     ]
     for option in options:
         chrome_options.add_argument(option)
+    
+    # Enable performance logging to capture network requests
+    chrome_options.set_capability('goog:loggingPrefs', {
+        'performance': 'ALL',
+        'browser': 'ALL'
+    })
+    
+    # Enable CDP (Chrome DevTools Protocol) for network monitoring
+    chrome_options.add_experimental_option('useAutomationExtension', False)
+    chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
+    
     return webdriver.Chrome(service=chrome_service, options=chrome_options)
 
 
@@ -51,10 +62,10 @@ def get_all_resturaunts():
     hfsaa = Hfsaa(driver)
     hms = Hms(driver)
 
-    resturaunts = hms.get_all_resturaunts()
-    resturaunts = resturaunts + hfsaa.get_all_resturaunts()
+    hms_resturaunts = hms.get_all_resturaunts()
+    hfsaa_resturaunts = hfsaa.get_all_resturaunts()
     driver.quit()
-    return resturaunts
+    return hms_resturaunts + hfsaa_resturaunts
 
 
 def process_resturaunts(resturaunts):
@@ -78,6 +89,6 @@ def process_resturaunts(resturaunts):
 
 if __name__ == '__main__':
     resturaunts = get_all_resturaunts()
-    print(resturaunts)
+    print(json.dumps(resturaunts))
     valid_resturaunts = process_resturaunts(resturaunts)
     export_locations(valid_resturaunts, LOCATIONS_FILEPATH)
