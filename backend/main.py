@@ -20,12 +20,12 @@ def setup_selenium():
     chrome_service = Service(ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install())
     chrome_options = Options()
     options = [
+    "--headless",
     "--window-size=1920,1200",
     "--ignore-certificate-errors",
     "--disable-extensions",
     "--no-sandbox",
-    "--disable-dev-shm-usage",
-    "--disable-blink-features=AutomationControlled",
+    "--disable-dev-shm-usage"
     "--disable-web-security",
     "--allow-running-insecure-content"
     ]
