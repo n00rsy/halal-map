@@ -9,6 +9,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
+from webdriver_manager.core.os_manager import ChromeType
 
 GMAPS_API_KEY = os.getenv('GMAPS_API_KEY')
 LOCATIONS_FILEPATH = os.getenv('LOCATIONS_FILEPATH')
@@ -16,7 +17,7 @@ GMAPS_CACHE_FILEPATH = os.getenv('GMAPS_CACHE_FILEPATH')
 
 
 def setup_selenium():
-    chrome_service = Service(ChromeDriverManager().install())
+    chrome_service = Service(ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install())
     chrome_options = Options()
     options = [
     "--window-size=1920,1200",
