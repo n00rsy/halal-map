@@ -65,7 +65,7 @@ class Hfsaa:
                     if message['message']['method'] == 'Network.requestWillBeSent':
                         request_url = message['message']['params']['request']['url']
                         # Check for Elfsight API calls
-                        if 'elfsight.com' in request_url.lower():
+                        if 'core.service.elfsight.com' in request_url.lower() and 'boot' in request_url.lower():
                             elfsight_request = request_url
                 except (json.JSONDecodeError, KeyError) as e:
                     print(f"Error parsing log entry: {e}")
