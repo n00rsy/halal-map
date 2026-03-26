@@ -20,9 +20,9 @@ jobs:
       - name: Remove default Chromium
         run: sudo apt purge chromium-browser
       - name: Install a new Chromium
-        run: sudo apt install -y chromium-browser
+        run: sudo apt install -y chromium-browser chromium-chromedriver
       - name: Install all necessary packages
-        run: pip install requests beautifulsoup4 pandas selenium titlecase googlemaps webdriver-manager
+        run: pip install requests beautifulsoup4 pandas selenium titlecase googlemaps
       - name: Run the scraping script
         env:
             LOCATIONS_FILEPATH: ${{ secrets.LOCATIONS_FILEPATH }}
