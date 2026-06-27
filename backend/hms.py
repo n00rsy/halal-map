@@ -21,6 +21,9 @@ class Hms:
 
         locations = []
         for row in rows:
+            if row.get('data-category') != 'Restaurants':
+                continue
+
             cells = row.find_all('td')
             if len(cells) < 6:
                 continue
