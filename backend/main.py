@@ -4,6 +4,7 @@ from datetime import datetime
 
 from gmaps_driver import GmapsDriver
 from hfsaa import Hfsaa
+from hmc import Hmc
 from hms import Hms
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -58,19 +59,26 @@ def export_locations(locations, filename):
 def get_all_resturaunts():
     driver = setup_selenium()
 
-    hfsaa = Hfsaa(driver)
-    hms = Hms(driver)
+    try:
+        hfsaa = Hfsaa(driver)
+        hms = Hms(driver)
 
-    hms_resturaunts = hms.get_all_resturaunts()
-    hfsaa_resturaunts = hfsaa.get_all_resturaunts()
-    driver.quit()
+        hms_resturaunts = hms.get_all_resturaunts()
+        hfsaa_resturaunts = hfsaa.get_all_resturaunts()
+    finally:
+        driver.quit()
+
+    hmc = Hmc()
+    hmc_resturaunts = hmc.get_all_resturaunts()
 
     if len(hms_resturaunts) == 0:
         raise Exception("Error: No HMS resturaunts found!")
     if len(hfsaa_resturaunts) == 0:
         raise Exception("Error: No HFSAA resturaunts found!")
+    if len(hmc_resturaunts) == 0:
+        raise Exception("Error: No HMC resturaunts found!")
     
-    return hms_resturaunts + hfsaa_resturaunts
+    return hms_resturaunts + hfsaa_resturaunts + hmc_resturaunts
 
 
 def process_resturaunts(resturaunts):
@@ -79,10 +87,13 @@ def process_resturaunts(resturaunts):
     for resturaunt in resturaunts:
         try:
             print(f'processing {resturaunt["name"]}...')
-            placeid, lat, lng = gmaps_driver.geocode(resturaunt['name'], resturaunt['address'])
-            resturaunt['lat'] = lat
-            resturaunt['lng'] = lng
-            resturaunt['nav_url'] = gmaps_driver.generate_google_maps_url(resturaunt['address'], placeid)
+            if resturaunt.get('lat') is None or resturaunt.get('lng') is None:
+                placeid, lat, lng = gmaps_driver.geocode(resturaunt['name'], resturaunt['address'])
+                resturaunt['lat'] = lat
+                resturaunt['lng'] = lng
+                resturaunt['nav_url'] = gmaps_driver.generate_google_maps_url(resturaunt['address'], placeid)
+            elif not resturaunt.get('nav_url'):
+                resturaunt['nav_url'] = gmaps_driver.generate_google_maps_url(resturaunt['address'])
 
             valid_resturaunts.append(resturaunt)
         except Exception as e:
