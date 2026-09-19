@@ -26,6 +26,11 @@
         const itemsPerPage = 20;
         let filteredData = [];
 
+        function getLocationIdentifier(location) {
+            const source = location.source_url || location.nav_url || `${location.name}-${location.address}`;
+            return source.replace(/[^a-zA-Z0-9]/g, '');
+        }
+
         function initMap() {
             map = new google.maps.Map(document.getElementById('map'), {
                 zoom: 4,
@@ -41,7 +46,7 @@
                     locationsData = data['places'];
                     // Initialize Fuse.js for fuzzy search
                     fuse = new Fuse(locationsData, {
-                        keys: ['name', 'address', 'state', 'phone', 'certification'],
+                        keys: ['name', 'address', 'state', 'country', 'phone', 'certification', 'type'],
                         threshold: 0.3,
                         includeScore: true
                     });
@@ -49,6 +54,7 @@
                     // Populate the table
                     populateTable(locationsData);
 
+                    const bounds = new google.maps.LatLngBounds();
                     data['places'].forEach(function (place) {
                         const glyphImg = document.createElement("img");
                         glyphImg.style.width = "10px"
@@ -63,7 +69,8 @@
                             title: place.name,
                             content: glyphSvgPinElement.element,
                         });
-                        let identifier = place.nav_url.substring(48).replace(/[^a-zA-Z0-9]/g, '');
+                        bounds.extend({ lat: place.lat, lng: place.lng });
+                        let identifier = getLocationIdentifier(place);
 
                         // Store marker reference
                         markersMap.set(identifier, marker);
@@ -86,6 +93,9 @@
                         if (place.phone) {
                             content += `<p><b>Phone:</b> <a href="tel:${place.phone}"> ${place.phone}</a></p>`
                         }
+                        if (place.type) {
+                            content += `<p><b>Type:</b> ${place.type}</p>`
+                        }
                         if (place.products) {
                             content += `<p><b>Products:</b>`
                             place.products.forEach(product => {
@@ -99,6 +109,10 @@
                         }
                         if (place.website) {
                             content += `<a href="${place.website}" target="_blank" class="btn btn-outline-secondary btn-block">Website</a>
+                        `
+                        }
+                        if (place.source_url) {
+                            content += `<a href="${place.source_url}" target="_blank" class="btn btn-outline-secondary btn-block">Certificate</a>
                         `
                         }
                         content += `<a href="${place.nav_url}" target="_blank" class="btn btn-primary btn-block">Navigate</a>
@@ -132,6 +146,9 @@
                             }
                         });
                     });
+                    if (!bounds.isEmpty()) {
+                        map.fitBounds(bounds);
+                    }
                     document.getElementById('last-updated').innerText = `Last updated: ${data['updated']}`
                 })
                 .catch(error => {
@@ -202,7 +219,7 @@
                 row.title = 'Click to view on map';
 
                 // Create identifier for this location (same as used in marker creation)
-                const identifier = location.nav_url.substring(48).replace(/[^a-zA-Z0-9]/g, '');
+                const identifier = getLocationIdentifier(location);
 
                 // Add click handler to show location on map and open info window
                 row.addEventListener('click', () => {
@@ -268,11 +285,11 @@
             const countElement = document.getElementById('results-count');
             if (countElement) {
                 if (totalCount === displayedCount) {
-                    countElement.textContent = `Showing ${totalCount} restaurant${totalCount !== 1 ? 's' : ''}`;
+                    countElement.textContent = `Showing ${totalCount} location${totalCount !== 1 ? 's' : ''}`;
                 } else {
                     const startIndex = (currentPage - 1) * itemsPerPage + 1;
                     const endIndex = Math.min(currentPage * itemsPerPage, totalCount);
-                    countElement.textContent = `Showing ${startIndex}-${endIndex} of ${totalCount} restaurant${totalCount !== 1 ? 's' : ''}`;
+                    countElement.textContent = `Showing ${startIndex}-${endIndex} of ${totalCount} location${totalCount !== 1 ? 's' : ''}`;
                 }
             }
         }
@@ -555,7 +572,7 @@
     <div class="container">
         <div id="map-content">
             <div class="mt-4">
-                <h1>USA Halal Certified Restaurants</h1>
+                <h1>Halal Certified Locations</h1>
                 <p>Click on the pins to explore!</p>
             </div>
 
@@ -563,11 +580,11 @@
 
             <!-- Locations Table Section -->
             <div class="mt-4">
-                <h2>Restaurant Locations</h2>
+                <h2>Certified Locations</h2>
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <input type="text" id="search-input" class="form-control"
-                            placeholder="Search by name, address, city, state, phone, or certification..."
+                            placeholder="Search by name, address, city, country, phone, certification, or type..."
                             onkeyup="filterTable()">
                     </div>
                     <div class="col-md-6 d-flex align-items-center mobile-spacing">
@@ -608,12 +625,12 @@
             <div class="mt-4">
                 <h1>About Halal Map</h1>
                 <br>
-                <h3>Find Halal-Certified Restaurants Near You 🍔</h3>
+                <h3>Find Halal-Certified Locations Near You</h3>
                 <p>
-                    This map pulls the latest data from HMS (Halal Monitoring Services) and HFSAA (Halal Food
+                    This map pulls the latest data from HMS (Halal Monitoring Services), HFSAA (Halal Food
                     Standards
-                    Alliance of America) daily, ensuring that you have up-to-date information on certified Halal
-                    restaurants across the U.S. Simply click on the pins to explore!
+                    Alliance of America), and HMC (Halal Monitoring Committee UK) daily, ensuring that you have
+                    up-to-date information on certified Halal locations. Simply click on the pins to explore!
                 </p>
 
                 <h4>What is Halal? 🤔</h4>
@@ -624,7 +641,7 @@
                     ingredients like pork or alcohol.
                 </p>
 
-                <h4>About HMS and HFSAA ℹ️</h4>
+                <h4>About HMS, HFSAA, and HMC</h4>
                 <p><strong>HMS (Halal Monitoring Services):</strong> a non-profit branch of the Shariah Board of
                     America, is run by an independent team of experienced Ulama, certifying and monitoring
                     hand-slaughtered Halal meat across the supply chain in over 13 U.S. states, ensuring adherence
@@ -639,16 +656,20 @@
                     as
                     hand slaughter by Muslim slaughterers, Tasmiya on each animal, and ensures non-meat products are
                     free of most alcohol and animal byproducts.</p>
+                <p><strong>HMC (Halal Monitoring Committee UK):</strong> an independent UK certification body that
+                    lists certified butchers, restaurants and takeaways, caterers, dessert shops, and other outlets
+                    through its official certified members directory.</p>
 
                 <h4>Verifying Certification</h4>
                 <p>
-                    <strong>Check for Certification Labels:</strong> Look for visible HMS or HFSAA certification
+                    <strong>Check for Certification Labels:</strong> Look for visible HMS, HFSAA, or HMC certification
                     labels at the establishment.
                 </p>
                 <p>
                     <strong>Visit Official Websites:</strong> For the most current information, visit the <a
-                        href="https://www.hmsusa.org/certified-listing.html">HMS website</a> or the <a
-                        href="https://www.hfsaa.org/restaurants/">HFSAA website</a>.
+                        href="https://www.hmsusa.org/certified-listing.html">HMS website</a>, the <a
+                        href="https://www.hfsaa.org/restaurants/">HFSAA website</a>, or the <a
+                        href="https://halalhmc.org/outlets-by-name/">HMC website</a>.
                 </p>
 
                 <script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js"
