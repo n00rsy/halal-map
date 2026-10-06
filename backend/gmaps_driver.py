@@ -36,9 +36,12 @@ class GmapsDriver:
             print(gmaps_result)
             raise Exception(f"invalid key:{key}")
 
-    def generate_google_maps_url(self, address, placeid):
+    def generate_google_maps_url(self, address, placeid=None):
         encoded_address = urllib.parse.quote(address)
-        return f"https://www.google.com/maps/search/?api=1&query={encoded_address}&query_place_id={placeid}"
+        url = f"https://www.google.com/maps/search/?api=1&query={encoded_address}"
+        if placeid:
+            url += f"&query_place_id={placeid}"
+        return url
 
     def write_cache(self):
         with open(self.gmaps_cache_filepath, 'w') as file:
